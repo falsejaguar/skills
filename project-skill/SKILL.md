@@ -1,73 +1,125 @@
 name: project-skill
-description: A skill for scaffolding project structures using real filesystem operations.
-
-requires:
-  - bash-skill
+description: A high-level orchestration skill for creating, resuming, and
+maintaining structured software projects using MCP servers. This skill provides
+guidance and workflow logic; actual filesystem, git, and shell operations are
+performed by their respective MCP tools.
 
 instructions: |
-  This skill provides structured project scaffolding capabilities. The LLM must
-  NEVER simulate filesystem changes. It must NEVER claim to create directories,
-  files, or project layouts on its own. All filesystem operations MUST be
-  performed using the bash tool provided by bash-skill.
+  ---------------------------------------------------------------------------
+  PURPOSE
+  ---------------------------------------------------------------------------
+  This skill coordinates multiple MCP servers (filesystem, bash, git, etc.)
+  to create, resume, and maintain software projects across iterations. It does
+  NOT perform filesystem operations itself. It does NOT simulate directory
+  creation, file writing, or git actions. It delegates all real operations to
+  the appropriate MCP tools.
 
   ---------------------------------------------------------------------------
-  TOOL USAGE RULES
+  TOOL SELECTION RULES
   ---------------------------------------------------------------------------
+  The agent MUST choose the correct MCP tool based on the operation:
 
-  1. The LLM MUST use the bash tool for all filesystem operations.
-     It MUST NOT describe imaginary directory creation or pretend to write files.
+    - Use the filesystem tool for:
+        * creating directories
+        * creating files
+        * writing file contents
+        * reading files
+        * deleting files or directories
 
-  2. Directory creation:
-       Use the bash tool with:
-         command: "mkdir -p <directory_path>"
+    - Use the bash tool for:
+        * shell commands
+        * environment inspection
+        * running build tools or CLIs
 
-  3. File creation:
-       Use the bash tool with:
-         command: "touch <file_path>"
+    - Use the git tool for:
+        * initializing repositories
+        * committing changes
+        * checking status
+        * creating branches
 
-  4. Writing content to a file:
-       Use the bash tool with:
-         command: "printf \"%s\" \"<content>\" > <file_path>"
+    - Use other MCP tools when appropriate (python, etc.).
 
-     - The LLM MUST escape quotes properly.
-     - The LLM MUST NOT simulate file content creation.
+  The agent MUST NOT redirect filesystem operations through bash unless the
+  filesystem tool cannot perform the requested action.
 
-  5. Creating nested project structures:
-       The LLM MUST issue multiple bash tool calls, one per operation.
-       It MUST NOT output a fake directory tree unless explicitly asked to
-       *describe* a structure rather than *create* it.
+  ---------------------------------------------------------------------------
+  PROJECT CREATION WORKFLOW
+  ---------------------------------------------------------------------------
+  When the user requests a new project:
 
-  6. When the user requests a project scaffold:
-       - The LLM MUST ask clarifying questions if the structure is ambiguous.
-       - The LLM MUST generate a step-by-step plan.
-       - The LLM MUST execute the plan using bash tool calls only.
+    1. Ask clarifying questions if the project structure is ambiguous.
+    2. Generate a clear plan describing:
+         - directories to create
+         - files to create
+         - initial content to write
+         - optional git initialization
+    3. Execute the plan using MCP tools.
+    4. Write a `.project-meta.json` file containing:
+         - project name
+         - creation timestamp
+         - tool versions (optional)
+         - list of generated directories and files
+         - iteration counter starting at 1
 
-  7. The LLM MUST NOT invent tools, schemas, or capabilities not defined in
-     bash-skill. It MUST NOT call tools from other skills unless explicitly
-     required.
+  ---------------------------------------------------------------------------
+  PROJECT RESUMPTION WORKFLOW
+  ---------------------------------------------------------------------------
+  When resuming a project:
+
+    1. Locate `.project-meta.json` using the filesystem tool.
+    2. Read and parse the metadata.
+    3. Increment the iteration counter.
+    4. Review existing files and directories.
+    5. Ask the user what they want to modify or extend.
+    6. Generate a plan for the requested changes.
+    7. Execute changes using MCP tools.
+    8. Update `.project-meta.json` with:
+         - new iteration number
+         - list of modified files
+         - list of new files
+         - timestamp
+
+  ---------------------------------------------------------------------------
+  TODO / TASK MANAGEMENT
+  ---------------------------------------------------------------------------
+  The agent MUST NOT invent TODO items.
+
+  The agent MAY manage TODOs ONLY if:
+    - the user explicitly requests TODO tracking, OR
+    - the project contains a TODO.md file.
+
+  TODOs MUST be stored in:
+    - `TODO.md` (markdown), OR
+    - `.project-meta.json` under "tasks".
+
+  The agent MUST NOT create TODOs on its own.
+
+  ---------------------------------------------------------------------------
+  SAFETY & NON-HALLUCINATION RULES
+  ---------------------------------------------------------------------------
+  - The agent MUST NOT simulate filesystem changes.
+  - The agent MUST NOT output imaginary directory trees unless the user asks
+    for a description rather than creation.
+  - The agent MUST NOT invent project metadata.
+  - The agent MUST NOT invent tool schemas.
+  - The agent MUST NOT invent TODOs.
+  - The agent MUST NOT claim success without calling the appropriate MCP tool.
 
   ---------------------------------------------------------------------------
   EXAMPLES
   ---------------------------------------------------------------------------
 
-  Example: Create a directory
-    Use bash tool:
-      command: "mkdir -p src/components"
+  Example: Create a project
+    Plan:
+      - Create directory: src/
+      - Create file: src/main.py
+      - Write content to src/main.py
+      - Create .project-meta.json
+    Execute using filesystem tool.
 
-  Example: Create a file
-    Use bash tool:
-      command: "touch README.md"
-
-  Example: Write content to a file
-    Use bash tool:
-      command: "printf \"%s\" \"# My Project\" > README.md"
-
-  ---------------------------------------------------------------------------
-  SUMMARY
-  ---------------------------------------------------------------------------
-
-  - All filesystem actions MUST use bash-skill.
-  - No hallucinated directory creation.
-  - No imaginary file writing.
-  - No simulated scaffolding.
-  - Only real bash tool calls.
+  Example: Resume a project
+    - Read .project-meta.json
+    - Increment iteration
+    - Ask user what to modify
+    - Apply changes using filesystem + git tools
+    - Update metadata
