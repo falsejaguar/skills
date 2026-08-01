@@ -1,79 +1,43 @@
+---
 name: bash
 description: A shell script execution server that allows AI models to execute real shell commands.
+allowed-tools: bash
+---
 
-allowed-tools:
-  - bash
+instructions: | 
 
-instructions: |
-  This skill exposes a bash execution tool that MUST be used for all shell
-  commands. The LLM MUST NOT simulate command execution, MUST NOT invent tools,
-  and MUST NOT describe imaginary filesystem changes. All shell actions MUST be
-  performed using the bash tool defined below.
+This skill exposes a bash execution tool that MUST be used for all shell commands. The LLM MUST NOT simulate command execution, MUST NOT invent tools, and MUST NOT describe imaginary filesystem changes. All shell actions MUST be performed using the bash tool defined below.
 
-  ---------------------------------------------------------------------------
-  TOOL INTERFACE
-  ---------------------------------------------------------------------------
+TOOL INTERFACE
+Tool name: bash Action: execute_command
 
-  Tool name: bash
-  Action: execute_command
+Input schema: { "command": "string" }
 
-  Input schema:
-    {
-      "command": "string"
-    }
+Output schema: { "stdout": "string", "stderr": "string", "exit_code": "number" }
 
-  Output schema:
-    {
-      "stdout": "string",
-      "stderr": "string",
-      "exit_code": "number"
-    }
+USAGE RULES
+The LLM MUST use the bash tool for all shell commands. It MUST NOT pretend to run commands or describe imaginary results.
 
-  ---------------------------------------------------------------------------
-  USAGE RULES
-  ---------------------------------------------------------------------------
+Commands MUST be passed exactly as a single string: command: ""
 
-  1. The LLM MUST use the bash tool for all shell commands.
-     It MUST NOT pretend to run commands or describe imaginary results.
+The LLM MUST NOT wrap commands in JSON, code blocks, or markdown. Only the tool call should contain the command.
 
-  2. Commands MUST be passed exactly as a single string:
-       command: "<shell command>"
+The LLM MUST escape quotes properly inside commands.
 
-  3. The LLM MUST NOT wrap commands in JSON, code blocks, or markdown.
-     Only the tool call should contain the command.
+The LLM MUST NOT chain multiple unrelated operations in one command unless the user explicitly requests it.
 
-  4. The LLM MUST escape quotes properly inside commands.
+The LLM MUST NOT invent environment variables or configuration flags.
 
-  5. The LLM MUST NOT chain multiple unrelated operations in one command
-     unless the user explicitly requests it.
+EXAMPLES
+Example: Create a directory Use bash tool: command: "mkdir -p src"
 
-  6. The LLM MUST NOT invent environment variables or configuration flags.
+Example: Create a file command: "touch README.md"
 
-  ---------------------------------------------------------------------------
-  EXAMPLES
-  ---------------------------------------------------------------------------
+Example: Write content to a file command: "printf "%s" "Hello" > README.md"
 
-  Example: Create a directory
-    Use bash tool:
-      command: "mkdir -p src"
+Example: List files command: "ls -la"
 
-  Example: Create a file
-      command: "touch README.md"
+CONFIGURATION
+SHELL_CMD: Environment variable that sets the shell command used for execution. Default: sh -c Can be changed to: bash -c, bash -x, zsh -c, etc.
 
-  Example: Write content to a file
-      command: "printf \"%s\" \"Hello\" > README.md"
-
-  Example: List files
-      command: "ls -la"
-
-  ---------------------------------------------------------------------------
-  CONFIGURATION
-  ---------------------------------------------------------------------------
-
-  SHELL_CMD:
-    Environment variable that sets the shell command used for execution.
-    Default: sh -c
-    Can be changed to: bash -c, bash -x, zsh -c, etc.
-
-  SHELL_TIMEOUT_DISABLED:
-    Set to true to disable the default 30-second timeout.
+SHELL_TIMEOUT_DISABLED: Set to true to disable the default 30-second timeout.
