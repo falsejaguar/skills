@@ -1,56 +1,123 @@
----
 name: filesystem
-description: Full filesystem control inside /main using Mudler's filesystem MCP server.   Use when user asks "create a file" "write" "read" "check files" "check folders" "create a new folder"
-allowed-tools: filesystem
----
+description: A skill describing how to use the filesystem MCP server to perform
+real file and directory operations. This skill provides usage guidance only;
+all actual filesystem actions are performed by the filesystem MCP tool.
 
-Tools:
+instructions: |
+  ---------------------------------------------------------------------------
+  PURPOSE
+  ---------------------------------------------------------------------------
+  This skill explains how the agent should use the filesystem MCP tool to
+  perform real filesystem operations. It does NOT simulate filesystem changes.
+  It does NOT redirect filesystem operations through bash. It does NOT invent
+  schemas. It does NOT override the behavior of the filesystem MCP server.
 
-read - Read file with line numbers, supports optional offset and limit for reading specific line ranges
-write - Write content to a file, creates parent directories if needed, overwrites existing files
-edit - Replace old string with new string in a file, old string must be unique unless all=true
-glob - Find files by glob pattern, sorted by modification time (newest first)
-grep - Search files for regex pattern, returns up to 50 matches
+  The filesystem MCP server is responsible for:
+    - creating directories
+    - creating files
+    - writing file contents
+    - reading file contents
+    - deleting files or directories
+    - listing directory contents
 
-Ensure all tool calls contain all required fields like path.
+  ---------------------------------------------------------------------------
+  TOOL USAGE RULES
+  ---------------------------------------------------------------------------
+  The agent MUST use the filesystem MCP tool for all filesystem operations.
 
-Read File Input Format:
+  The agent MUST NOT:
+    - simulate directory creation
+    - simulate file creation
+    - output imaginary directory trees
+    - pretend to write or delete files
+    - claim success without calling the filesystem tool
+    - redirect filesystem operations through bash unless explicitly required
 
-{
-  "path": "/path/to/file.txt",
-  "offset": 0,
-  "limit": 50
-}
-Read File Output Format:
+  The agent MAY use bash for:
+    - shell commands
+    - build tools
+    - environment inspection
+    - running CLIs
 
-{
-  "content": "   1| line one\n   2| line two",
-  "total_lines": 100,
-  "success": true
-}
-Write File Input Format:
+  But NOT for filesystem operations that the filesystem MCP tool already
+  supports.
 
-{
-  "path": "/path/to/file.txt",
-  "content": "file content here"
-}
-Edit File Input Format:
+  ---------------------------------------------------------------------------
+  OPERATION GUIDANCE
+  ---------------------------------------------------------------------------
 
-{
-  "path": "/path/to/file.txt",
-  "old": "old text",
-  "new": "new text",
-  "all": false
-}
-Glob Files Input Format:
+  Create a directory:
+    Use the filesystem tool with:
+      action: "create_directory"
+      path: "<directory_path>"
 
-{
-  "pat": "**/*.go",
-  "path": "."
-}
-Grep Files Input Format:
+  Create a file:
+      action: "create_file"
+      path: "<file_path>"
 
-{
-  "pat": "func main",
-  "path": "."
-}
+  Write content to a file:
+      action: "write_file"
+      path: "<file_path>"
+      content: "<content>"
+
+  Append content to a file:
+      action: "append_file"
+      path: "<file_path>"
+      content: "<content>"
+
+  Read a file:
+      action: "read_file"
+      path: "<file_path>"
+
+  Delete a file:
+      action: "delete_file"
+      path: "<file_path>"
+
+  Delete a directory:
+      action: "delete_directory"
+      path: "<directory_path>"
+
+  List directory contents:
+      action: "list_directory"
+      path: "<directory_path>"
+
+  ---------------------------------------------------------------------------
+  PROJECT WORKFLOW INTEGRATION
+  ---------------------------------------------------------------------------
+  When used by project-skill:
+
+    - The filesystem tool MUST be used to create project structures.
+    - The filesystem tool MUST be used to read and update .project-meta.json.
+    - The filesystem tool MUST be used to manage TODO.md if present.
+    - The agent MUST NOT invent project metadata.
+    - The agent MUST NOT invent TODOs.
+    - The agent MUST NOT simulate project scaffolding.
+
+  The filesystem skill does NOT enforce project logic; it only ensures correct
+  usage of the filesystem MCP server.
+
+  ---------------------------------------------------------------------------
+  SAFETY RULES
+  ---------------------------------------------------------------------------
+  - The agent MUST NOT invent tool schemas.
+  - The agent MUST NOT invent fields not supported by the filesystem MCP tool.
+  - The agent MUST NOT hallucinate directory trees or file contents.
+  - The agent MUST NOT claim success without calling the filesystem tool.
+  - The agent MUST ask clarifying questions if paths or structures are unclear.
+
+  ---------------------------------------------------------------------------
+  EXAMPLES
+  ---------------------------------------------------------------------------
+
+  Example: Create a directory
+    action: "create_directory"
+    path: "src/components"
+
+  Example: Write content to a file
+    action: "write_file"
+    path: "README.md"
+    content: "# My Project"
+
+  Example: Read metadata file
+    action: "read_file"
+    path: ".project-meta.json"
