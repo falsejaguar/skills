@@ -1,5 +1,5 @@
 ---
-name: projfect-skill
+name: project-skill
 description: A high-level orchestration skill for creating, resuming, and maintaining structured software projects using MCP servers. This skill provides guidance and workflow logic; actual filesystem, git, and shell operations are performed by their respective MCP tools.
 ---
 
