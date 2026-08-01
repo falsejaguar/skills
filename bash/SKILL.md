@@ -1,49 +1,79 @@
----
 name: bash
-description: A shell script execution server that allows AI models to execute shell scripts and commands.  Use for bash execution.
-allowed-tools: bash
----
+description: A shell script execution server that allows AI models to execute real shell commands.
 
-How to use the bash mcp tool.
+allowed-tools:
+  - bash
 
-Features:
+instructions: |
+  This skill exposes a bash execution tool that MUST be used for all shell
+  commands. The LLM MUST NOT simulate command execution, MUST NOT invent tools,
+  and MUST NOT describe imaginary filesystem changes. All shell actions MUST be
+  performed using the bash tool defined below.
 
-Execute shell scripts with full shell capabilities
-Configurable shell command (default: sh -c)
-Separate stdout and stderr capture
-Exit code reporting
-Configurable timeout (default: 30 seconds)
-JSON schema validation for inputs/outputs
-Tool:
+  ---------------------------------------------------------------------------
+  TOOL INTERFACE
+  ---------------------------------------------------------------------------
 
-execute_command - Execute a shell script and return the output, exit code, and any errors
-Configuration:
+  Tool name: bash
+  Action: execute_command
 
-SHELL_CMD - Environment variable to set the shell command to use (default: sh -c). Can include arguments, e.g., bash -x or zsh
-SHELL_TIMEOUT_DISABLED - Set to true to disable the timeout completely (default: timeout is 30 seconds)
-SHELL_TIMEOUT - Environment variable to set the timeout in seconds (default: 30 seconds)
-SHELL_WORKING_DIR - Environment variable to set the working directory for script execution (default: current directory)
-Input Format:
+  Input schema:
+    {
+      "command": "string"
+    }
 
-{
-  "script": "ls -la /tmp",
-  "timeout": 30
-}
-Output Format:
+  Output schema:
+    {
+      "stdout": "string",
+      "stderr": "string",
+      "exit_code": "number"
+    }
 
-{
-  "script": "ls -la /tmp",
-  "stdout": "total 1234\ndrwxrwxrwt...",
-  "stderr": "",
-  "exit_code": 0,
-  "success": true,
-  "error": ""
-**Docker Image:**
-```bash
-docker run -e SHELL_CMD=bash ghcr.io/mudler/mcps/shell:latest
-With timeout disabled:
+  ---------------------------------------------------------------------------
+  USAGE RULES
+  ---------------------------------------------------------------------------
 
-docker run -e SHELL_CMD=bash -e SHELL_TIMEOUT_DISABLED=true ghcr.io/mudler/mcps/shell:latest
-With custom working directory:
+  1. The LLM MUST use the bash tool for all shell commands.
+     It MUST NOT pretend to run commands or describe imaginary results.
 
-docker run -e SHELL_CMD=bash -e SHELL_WORKING_DIR=/workspace ghcr.io/mudler/mcps/shell:latest
+  2. Commands MUST be passed exactly as a single string:
+       command: "<shell command>"
+
+  3. The LLM MUST NOT wrap commands in JSON, code blocks, or markdown.
+     Only the tool call should contain the command.
+
+  4. The LLM MUST escape quotes properly inside commands.
+
+  5. The LLM MUST NOT chain multiple unrelated operations in one command
+     unless the user explicitly requests it.
+
+  6. The LLM MUST NOT invent environment variables or configuration flags.
+
+  ---------------------------------------------------------------------------
+  EXAMPLES
+  ---------------------------------------------------------------------------
+
+  Example: Create a directory
+    Use bash tool:
+      command: "mkdir -p src"
+
+  Example: Create a file
+      command: "touch README.md"
+
+  Example: Write content to a file
+      command: "printf \"%s\" \"Hello\" > README.md"
+
+  Example: List files
+      command: "ls -la"
+
+  ---------------------------------------------------------------------------
+  CONFIGURATION
+  ---------------------------------------------------------------------------
+
+  SHELL_CMD:
+    Environment variable that sets the shell command used for execution.
+    Default: sh -c
+    Can be changed to: bash -c, bash -x, zsh -c, etc.
+
+  SHELL_TIMEOUT_DISABLED:
+    Set to true to disable the default 30-second timeout.
