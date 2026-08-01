@@ -27,7 +27,7 @@ instructions: |
 
   4. Writing content to a file:
        Use the bash tool with:
-         command: "printf \"%s\" '<content>' > <file_path>"
+         command: "printf \"%s\" \"<content>\" > <file_path>"
 
      - The LLM MUST escape quotes properly.
      - The LLM MUST NOT simulate file content creation.
