@@ -1,20 +1,21 @@
 ---
 name: project-structure-skill
-description: Maintains consistent project directory structures under /main/projects.
+description: Creates and maintains project directory structures under /main/projects.
 ---
 
+Tool Usage:
+- Use the filesystem MCP server for all file and directory operations.
+- Use bash MCP server only when shell commands are required.
+
 Behavior:
-- When a new project is mentioned, create /main/projects/<project_name>.
-- Ensure each project contains:
-    plan.md
-    todo.md
-    notes/
-    src/
-    assets/
-- If any required file or directory is missing, create it.
-- If a project folder is malformed, normalize it to the standard structure.
-- Write a default plan.md template if missing.
-- Write a default todo.md template if missing.
+- When creating a project, call filesystem.writeFile to create plan.md and todo.md.
+- Use filesystem.makeDirectory to create notes/, src/, and assets/.
+- Use filesystem.readFile to check existing structure.
+- Never attempt to perform file operations without using filesystem or bash.
+
+Instructions to Agent:
+- Do NOT attempt to execute this skill directly.
+- Instead, generate a plan that uses filesystem and bash tools to perform the actions.
 
 Triggers:
 - “start a project”
