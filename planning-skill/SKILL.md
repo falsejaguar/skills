@@ -3,21 +3,19 @@ name: planning-skill
 description: Maintains todo.md and plan.md inside each project and generates actionable plans.
 ---
 
-Behavior:
-- Add tasks to todo.md.
-- Mark tasks complete.
-- Remove tasks.
-- Rewrite plan.md sections when progress changes.
-- Generate step-by-step plans for coding tasks.
-- Keep plan.md synchronized with todo.md.
+Tool Usage:
+- Use filesystem.readFile to load todo.md and plan.md.
+- Use filesystem.writeFile to update them.
+- Use bash only for text manipulation when necessary.
 
-Triggers:
-- “add a task”
-- “update the plan”
-- “mark this done”
-- “create a TODO”
-- “what’s next”
-- “plan this out”
+Behavior:
+- Add tasks by rewriting todo.md.
+- Mark tasks complete by updating checkbox states.
+- Synchronize plan.md with todo.md.
+
+Instructions to Agent:
+- Do NOT execute this skill directly.
+- Instead, generate a plan that uses filesystem tool calls to modify the files.
 
 TODO Format:
 - [ ] Task description
