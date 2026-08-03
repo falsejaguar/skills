@@ -4,6 +4,7 @@ description: Resumes work on existing projects by reading plan.md and todo.md.
 ---
 
 Tool Usage:
+Before scanning project folders, check /main/projects/_index/active.json. If it exists, resume the project listed under last_active. If missing, fall back to scanning project folders.
 - Use filesystem.listDirectory to find project folders.
 - Use filesystem.readFile to load plan.md and todo.md.
 - Use filesystem.writeFile to update plan.md or todo.md.
