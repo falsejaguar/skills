@@ -4,6 +4,7 @@ description: Maintains todo.md and plan.md inside each project and generates act
 ---
 
 Tool Usage:
+Whenever progress is made on a project, update /main/projects/_index/active.json to set last_active to that project.
 - Use filesystem.readFile to load todo.md and plan.md.
 - Use filesystem.writeFile to update them.
 - Use bash only for text manipulation when necessary.
