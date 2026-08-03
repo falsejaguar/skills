@@ -12,7 +12,8 @@ Behavior:
 - Use filesystem.makeDirectory to create notes/, src/, and assets/.
 - Use filesystem.readFile to check existing structure.
 - Never attempt to perform file operations without using filesystem or bash.
-
+- Update TODO after each step is accomplished to ensure proper step tracking.
+  
 Instructions to Agent:
 - Do NOT attempt to execute this skill directly.
 - Instead, generate a plan that uses filesystem and bash tools to perform the actions.
