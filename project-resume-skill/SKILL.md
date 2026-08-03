@@ -10,9 +10,10 @@ Before scanning project folders, check /main/projects/_index/active.json. If it 
 - Use filesystem.writeFile to update plan.md or todo.md.
 
 Behavior:
-- Identify the most recently modified project using filesystem.stat.
+- Identify the most recently modified project using filesystem.stat and/or active.json.
 - Parse TODO checkboxes from todo.md.
 - Suggest next steps based on incomplete tasks.
+- Begin work and update TODO checkboxes after each step and ensure proper step tracking
 
 Instructions to Agent:
 - Do NOT execute this skill directly.
