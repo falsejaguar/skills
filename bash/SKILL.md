@@ -4,16 +4,14 @@ description: A shell script execution server that allows AI models to execute re
 allowed-tools: bash
 ---
 
-instructions: | 
+## Tools
 
-This skill exposes a bash execution tool that MUST be used for all shell commands. The LLM MUST NOT simulate command execution, MUST NOT invent tools, and MUST NOT describe imaginary filesystem changes. All shell actions MUST be performed using the bash tool defined below.
+### execute
+Run a shell command.
 
-TOOL INTERFACE
-Tool name: bash Action: execute_command
-
-Input schema: { "command": "string" }
-
-Output schema: { "stdout": "string", "stderr": "string", "exit_code": "number" }
+#### Arguments
+- command (string): The shell command to execute.
+- timeout (integer, optional): Timeout in seconds. If omitted, server default applies.
 
 USAGE RULES
 The LLM MUST use the bash tool for all shell commands. It MUST NOT pretend to run commands or describe imaginary results.
