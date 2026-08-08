@@ -17,4 +17,4 @@ Behavior:
 
 Instructions to Agent:
 - Do NOT execute this skill directly.
-- Instead, produce a sequence of filesystem tool calls to inspect project files.
+- Instead, produce a sequence of tool calls to inspect project files.
