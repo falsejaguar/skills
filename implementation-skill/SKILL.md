@@ -6,7 +6,7 @@ description: A universal implementation skill that takes a completed project pla
 # Implementation Skill
 
 ## Purpose
-This skill performs full project implementation after planning and scaffolding are complete. It generates complete source code for every file, writes the code using filesystem.writeFile, installs dependencies when required, compiles languages that need compilation, runs the project when appropriate, and iterates until the project is fully functional.
+This skill performs full project implementation after planning and scaffolding are complete. It generates complete source code for every file, writes the code using filesystem.writeFile or other more powerful available skills, installs dependencies when required, compiles languages that need compilation, runs the project when appropriate, and iterates until the project is fully functional.
 
 ## Behavior
 
@@ -19,12 +19,12 @@ Begin implementation only after:
 For every file listed in the project plan:
 - Generate full, functional code appropriate to the project's language, framework, and requirements.
 - Ensure the code is complete, not placeholder or partial.
-- Write the code into the file using filesystem.writeFile.
+- Write the code into the files using bash skill or filesystem skill.
 
 ### 3. Handle dependencies
 If the project requires dependencies:
 - Identify the correct dependency manager for the language (e.g., pip, cargo, npm, go mod, etc.).
-- Use bash.run to install dependencies.
+- Use skills to install dependencies.
 - If installation fails, diagnose the issue, adjust the dependency list or code, and retry.
 
 ### 4. Handle compilation (if required)
@@ -39,12 +39,12 @@ If the language requires compilation (e.g., C, C++, Rust, Go, Java):
 
 ### 5. Handle execution (if appropriate)
 If the project is meant to run:
-- Use bash.run to execute the program.
+- Use tools to execute the program.
 - If runtime errors occur:
   - Capture the error output.
   - Diagnose the issue.
   - Regenerate or patch the relevant code.
-  - Rewrite the corrected code using filesystem.writeFile.
+  - Rewrite the corrected code using available skills and tools.
   - Re-run until successful.
 
 ### 6. Iterate until completion
@@ -60,9 +60,7 @@ Continue implementing, compiling, fixing, and running until:
 - Never stop after scaffolding.
 - Always proceed to full implementation unless the user explicitly requests only planning.
 - Always fix compilation or runtime errors automatically.
-- Always write code using filesystem.writeFile, never inline in the agent output.
-- Always use bash.run for dependency installation, compilation, and execution.
+- Always write code using the best available tool, never inline in the agent output.
+- Always use skills and tools to handle dependency installation, compilation, and execution.
 
-## Tools
-- filesystem.writeFile
-- bash.run
+
